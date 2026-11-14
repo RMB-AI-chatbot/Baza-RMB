@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>baza-RMB admin test page</title>
+<style>
+  :root { --blue:#0b5e8e; --bg:#f4f6f9; --line:#dde3ea; --muted:#6b7785; --red:#b42318; --green:#067647; }
+  * { box-sizing:border-box; }
+  body { font-family: system-ui, sans-serif; margin:0; background:var(--bg); color:#1d2733; font-size:14px; }
+  header { background:var(--blue); color:#fff; padding:10px 20px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  header small { opacity:.8 }
+  header input { padding:6px 8px; border-radius:6px; border:0; width:280px; }
+  nav { display:flex; gap:4px; padding:10px 20px 0; flex-wrap:wrap; }
+  nav button { background:#fff; color:var(--blue); border:1px solid var(--line); border-bottom:0; border-radius:8px 8px 0 0; padding:8px 14px; cursor:pointer; }
+  nav button.on { background:var(--blue); color:#fff; }
+  main { padding:16px 20px; }
+  section { display:none; } section.on { display:block; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin-bottom:14px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; }
+  .card .n { font-size:24px; font-weight:600; } .card .l { color:var(--muted); font-size:12px; text-transform:uppercase; }
+  .panel { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; margin-bottom:14px; overflow-x:auto; }
+  table { border-collapse:collapse; width:100%; } th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:500; font-size:12px; text-transform:uppercase; }
+  button.b { background:var(--blue); color:#fff; border:0; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:13px; }
+  button.s { background:#fff; color:var(--blue); border:1px solid var(--blue); padding:4px 9px; border-radius:6px; cursor:pointer; font-size:12px; }
+  input, select, textarea { padding:6px; border:1px solid var(--line); border-radius:6px; font:inherit; }
+  textarea { width:100%; }
+  .pill { display:inline-block; padding:1px 8px; border-radius:10px; font-size:12px; background:#eef3f8; }
+  .pill.bad { background:#fde8e8; color:var(--red); } .pill.ok { background:#e7f6ec; color:var(--green); }
+  .msg { padding:8px 10px; border-radius:8px; margin:6px 0; white-space:pre-wrap; }
+  .msg.user { background:var(--blue); color:#fff; margin-left:20%; } .msg.assistant { background:#eef3f8; margin-right:20%; }
+  .meta { color:var(--muted); font-size:12px; }
+  .bar { height:8px; background:#e6edf4; border-radius:4px; } .bar i { display:block; height:8px; background:var(--blue); border-radius:4px; }
+  #toast { position:fixed; bottom:16px; right:16px; background:#1d2733; color:#fff; padding:10px 14px; border-radius:8px; display:none; max-width:420px; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+  pre { white-space:pre-wrap; background:#f7f9fb; padding:8px; border-radius:6px; font-size:12px; max-height:260px; overflow:auto; }
+</style>
+</head>
+<body>
+<header>
+  <strong>baza-RMB admin</strong><small>test page for the admin API, not the production dashboard</small>
+  <span style="flex:1"></span>
+  <label>Admin key <input id="key" type="password" placeholder="ADMIN_API_KEY from .env"></label>
+  <button class="s" style="background:#fff" onclick="saveKey()">Connect</button>
+</header>
+<nav id="tabs"></nav>
+<main>
+  <section id="dashboard">
+    <div class="row">Period <select id="days" onchange="loadDashboard()"><option>1</option><option>7</option><option selected>30</option><option>90</option></select> days</div>
+    <div class="cards" id="cards"></div>
+    <div class="panel"><b>Questions by category</b><table id="cats"></table></div>
+    <div class="panel"><b>Most cited documents</b><table id="topdocs"></table></div>
+    <div class="panel"><b>Daily activity</b><table id="daily"></table></div>
+  </section>
+
+  <section id="conversations">
+    <div class="row">
+      <input id="convq" placeholder="Search first question…"> <button class="b" onclick="loadConversations()">Search</button>
+    </div>
+    <div class="panel"><table id="convs"></table></div>
+    <div class="panel" id="convdetail" style="display:none"></div>
+  </section>
+
+  <section id="gaps">
+    <p class="meta">Questions the bot could not answer from the documents. Use them to decide which documents RMB should add next.</p>
+    <div class="row">Status <select id="gapstatus" onchange="loadGaps()"><option>open</option><option>resolved</option><option>ignored</option></select></div>
+    <div class="panel"><table id="gaptable"></table></div>
+  </section>
+
+  <section id="faq">
+    <p class="meta">Official answers written by RMB staff. A draft is used by the bot only after a <b>different</b> staff member publishes it (four-eyes rule). Editing a published answer takes it offline until it is approved again.</p>
+    <div class="panel" id="faqform">
+      <b id="faqformtitle">Write an official answer</b>
+      <input type="hidden" id="f_id"><input type="hidden" id="f_source_type" value="manual"><input type="hidden" id="f_source_ref">
+      <div class="meta" id="f_source"></div>
+      <p><input id="f_question" placeholder="Question (as people ask it) *" style="width:100%"></p>
+      <p><textarea id="f_answer" rows="5" placeholder="Official answer *  (plain language; include fees, steps, contacts as RMB confirms them)"></textarea></p>
+      <div class="row">
+        <select id="f_category"><option value="">category...</option><option>licensing</option><option>investment</option><option>mineral_trading</option><option>taxation</option><option>environment</option><option>health_safety</option><option>geology</option><option>petroleum_gas</option><option>asm</option><option>complaints</option><option>general</option></select>
+        <input id="f_owner" placeholder="Owner department *"> <label class="meta">Review date <input type="date" id="f_review"></label>
+        <input id="f_by" placeholder="Your name *"> <button class="b" onclick="saveFaq()">Save draft</button> <button class="s" onclick="resetFaq()">Clear</button>
+      </div>
+    </div>
+    <div class="row">Status <select id="faqstatus" onchange="loadFaq()"><option value="">all</option><option>draft</option><option>active</option><option>retired</option></select></div>
+    <div class="panel"><table id="faqtable"></table></div>
+  </section>
+
+  <section id="documents">
+    <div class="cards" id="doccards"></div>
+    <div class="panel"><table id="doctable"></table></div>
+    <div class="panel" id="chunkview" style="display:none"></div>
+    <div class="panel">
+      <b>Upload a PDF</b> <span class="meta">(indexed in the background; stays in draft until you publish it)</span>
+      <form id="upload" class="row" style="margin-top:8px">
+        <input type="file" name="file" accept="application/pdf" required>
+        <input name="title" placeholder="Title *" required size="30">
+        <input name="short_title" placeholder="Short title" size="18">
+        <select name="doc_type"><option>law</option><option>regulation</option><option>guide</option><option>faq</option><option>prospectus</option><option>directory</option><option selected>other</option></select>
+        <input name="owner" placeholder="Owner (department) *" required>
+        <input name="version" placeholder="Version">
+        <label class="meta">Review date <input type="date" name="review_date"></label>
+        <input name="uploaded_by" placeholder="Your name *" required>
+        <button class="b">Upload</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="cases">
+    <div class="row">Show <select id="caserel" onchange="loadCases()"><option value="inbox">Inbox (relevant + unclear)</option><option value="spam">Likely spam</option><option value="all">All</option></select>
+      Status <select id="casestatus" onchange="loadCases()"><option value="">all</option><option>new</option><option>assigned</option><option>in_progress</option><option>waiting_for_user</option><option>resolved</option><option>closed</option></select></div>
+    <div class="panel"><table id="casetable"></table></div>
+    <div class="panel" id="casedetail" style="display:none"></div>
+    <div class="panel"><b>Routing table</b> <span class="meta">(placeholders until RMB confirms)</span><table id="routing"></table></div>
+  </section>
+
+  <section id="settings">
+    <div class="panel"><b>Editable settings</b> <span class="meta">(JSON; saved in the database, applied within 30 s)</span>
+      <textarea id="settingsjson" rows="22" style="font-family:monospace;font-size:12px;margin-top:8px"></textarea>
+      <div class="row" style="margin-top:8px"><input id="setby" placeholder="Your name *"> <button class="b" onclick="saveSettings()">Save</button></div>
+    </div>
+    <div class="panel"><b>Read-only (from .env)</b><pre id="readonly"></pre></div>
+  </section>
+</main>
+<div id="toast"></div>
+
+<script>
+const API = "/api/v1/admin";
+const TABS = {dashboard: "Dashboard", conversations: "Conversations", gaps: "Knowledge gaps", faq: "FAQ answers", documents: "AI Knowledge", cases: "Cases", settings: "Settings"};
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = d => d ? new Date(d).toLocaleString() : "";
+let key = sessionStorage.getItem("bazaAdminKey") || "";
+document.getElementById("key").value = key;
+
+function toast(m) { const t = document.getElementById("toast"); t.textContent = m; t.style.display = "block"; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = "none", 4000); }
+function saveKey() { key = document.getElementById("key").value.trim(); sessionStorage.setItem("bazaAdminKey", key); show(current); }
+async function api(path, opts = {}) {
+  const r = await fetch(API + path, {...opts, headers: {"X-Admin-Key": key, ...(opts.body && !(opts.body instanceof FormData) ? {"Content-Type": "application/json"} : {}), ...(opts.headers || {})}});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const m = j.detail ? (typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail)) : (j.error || r.status); toast("Error: " + m); throw new Error(m); }
+  return j;
+}
+const rows = (el, head, items, fn) => { document.getElementById(el).innerHTML = `<tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>` + (items.length ? items.map(fn).join("") : `<tr><td colspan="${head.length}" class="meta">Nothing yet</td></tr>`); };
+
+let current = "dashboard";
+const nav = document.getElementById("tabs");
+for (const [id, label] of Object.entries(TABS)) { const b = document.createElement("button"); b.textContent = label; b.onclick = () => show(id); b.id = "tab-" + id; nav.appendChild(b); }
+function show(id) {
+  current = id;
+  document.querySelectorAll("section").forEach(s => s.classList.toggle("on", s.id === id));
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.id === "tab-" + id));
+  if (!key) { toast("Enter the admin key (ADMIN_API_KEY in .env) and click Connect"); return; }
+  ({dashboard: loadDashboard, conversations: loadConversations, gaps: loadGaps, faq: loadFaq, documents: loadDocuments, cases: loadCases, settings: loadSettings})[id]();
+}
+
+// ---------------- dashboard
+async function loadDashboard() {
+  const d = await api(`/analytics/summary?days=${document.getElementById("days").value}`), t = d.totals;
+  const pct = v => v == null ? "–" : Math.round(v * 100) + "%";
+  const card = (n, l) => `<div class="card"><div class="n">${n ?? 0}</div><div class="l">${l}</div></div>`;
+  document.getElementById("cards").innerHTML =
+    card(t.conversations, "Conversations") + card(t.questions, "Questions") + card(pct(t.answer_rate), "Answered from documents") +
+    card(t.not_covered, "Not covered") + card(t.open_knowledge_gaps, "Open knowledge gaps") + card(t.forms_offered, "Forms offered") +
+    card(t.emergencies, "Emergencies") + card(t.handovers, "Legal handovers") +
+    card(t.median_latency_ms ? (t.median_latency_ms / 1000).toFixed(1) + " s" : "–", "Median response time") +
+    card(`${t.thumbs_up} / ${t.thumbs_down}`, "Feedback 👍 / 👎") + card((t.input_tokens + t.output_tokens).toLocaleString(), "LLM tokens used");
+  const max = Math.max(1, ...d.by_category.map(c => c.n));
+  rows("cats", ["Category", "Messages", ""], d.by_category, c => `<tr><td>${esc(c.category)}</td><td>${c.n}</td><td style="width:50%"><div class="bar"><i style="width:${100 * c.n / max}%"></i></div></td></tr>`);
+  rows("topdocs", ["Document", "Citations"], d.top_documents, x => `<tr><td>${esc(x.document)}</td><td>${x.citations}</td></tr>`);
+  rows("daily", ["Day", "Conversations", "Questions"], d.daily, x => `<tr><td>${x.day}</td><td>${x.conversations}</td><td>${x.questions}</td></tr>`);
+}
+
+// ---------------- conversations
+async function loadConversations() {
+  const q = document.getElementById("convq").value.trim();
+  const list = await api(`/conversations?days=90${q ? "&q=" + encodeURIComponent(q) : ""}`);
+  rows("convs", ["Started", "First question", "Category", "Replies", "Flags", ""], list, c => `<tr><td>${fmt(c.created_at)}</td><td>${esc(c.first_question)}</td><td><span class="pill">${esc(c.category)}</span></td><td>${c.replies}</td>
+    <td>${c.had_emergency ? '<span class="pill bad">emergency</span> ' : ""}${c.had_unanswered ? '<span class="pill bad">unanswered</span>' : ""}</td>
+    <td><button class="s" onclick="openConv('${c.session_id}')">Open</button></td></tr>`);
+}
+async function openConv(id) {
+  const d = await api(`/conversations/${id}`), el = document.getElementById("convdetail");
+  el.style.display = "block";
+  el.innerHTML = `<b>Conversation ${id}</b>` + d.messages.map(m => `<div class="msg ${m.role}">${esc(m.content)}</div>` +
+    (m.role === "assistant" ? `<div class="meta">intent ${m.intent} · action ${m.action} · top score ${m.top_score?.toFixed?.(3) ?? "–"} · ${m.latency_ms} ms · ${m.model || "no model call"}${m.standalone_query ? " · searched: “" + esc(m.standalone_query) + "”" : ""}${m.feedback ? " · feedback " + m.feedback : ""}</div>` +
+      (m.sources ? `<div class="meta">sources: ${m.sources.map(s => `[${s.n}] ${esc(s.short_title)} ${esc(s.section || "")} p.${esc(s.page || "")}`).join("; ")}</div>` : "") : "")).join("");
+  el.scrollIntoView({behavior: "smooth"});
+}
+
+// ---------------- knowledge gaps
+async function loadGaps() {
+  const st = document.getElementById("gapstatus").value, list = await api(`/unanswered?status=${st}`);
+  rows("gaptable", ["When", "Question", "Category", "Reason", "Top score", "Note", ""], list, g => `<tr><td>${fmt(g.created_at)}</td><td>${esc(g.question)}</td><td>${esc(g.category)}</td><td><span class="pill">${esc(g.reason)}</span></td><td>${g.top_score?.toFixed?.(3) ?? ""}</td><td>${esc(g.note)}</td>
+    <td>${st === "open" ? `<button class="b" data-type="gap" data-ref="${g.id}" data-q="${esc(g.question)}" data-cat="${esc(g.category)}" onclick="answerFrom(this.dataset)">Answer</button> <button class="s" onclick="gap(${g.id},'resolved')">Resolved</button> <button class="s" onclick="gap(${g.id},'ignored')">Ignore</button>` : `<button class="s" onclick="gap(${g.id},'open')">Reopen</button>`}</td></tr>`);
+}
+async function gap(id, status) {
+  const note = status === "open" ? null : prompt("Note (optional), e.g. which document was added:") || null;
+  await api(`/unanswered/${id}`, {method: "PATCH", body: JSON.stringify({status, note})}); toast("Updated"); loadGaps();
+}
+
+// ---------------- documents
+async function loadDocuments() {
+  const d = await api("/documents"), s = d.summary;
+  const card = (n, l) => `<div class="card"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+  document.getElementById("doccards").innerHTML = card(s.documents, "Documents") + card(s.active, "Active (used for answers)") + card(s.indexed_chunks, "Indexed chunks") + card(s.processing, "Processing") + card(s.needs_review, "Need review / failed") + card(s.review_overdue, "Review overdue");
+  rows("doctable", ["Document", "Type", "Owner / version", "Review date", "Status", "Processing", "Chunks", ""], d.documents, x => `<tr>
+    <td><b>${esc(x.short_title)}</b><div class="meta">${esc(x.id)}</div></td><td>${esc(x.doc_type)}</td>
+    <td>${esc(x.owner)}<div class="meta">${esc(x.version)}</div></td>
+    <td>${esc(x.review_date || "")}${x.review_overdue ? ' <span class="pill bad">overdue</span>' : ""}</td>
+    <td><span class="pill ${x.status === "active" ? "ok" : x.status === "retired" ? "bad" : ""}">${x.status}</span></td>
+    <td><span class="pill ${x.processing_status === "indexed" ? "ok" : ["failed", "needs_review"].includes(x.processing_status) ? "bad" : ""}" title="${esc(x.processing_error)}">${x.processing_status}</span></td>
+    <td>${x.chunk_count}</td>
+    <td style="white-space:nowrap">${x.status !== "active" ? `<button class="s" onclick="docStatus('${x.id}','active')">Publish</button>` : `<button class="s" onclick="docStatus('${x.id}','draft')">Unpublish</button>`}
+      <button class="s" onclick="docStatus('${x.id}','retired')">Retire</button> <button class="s" onclick="reindex('${x.id}')">Reindex</button>
+      <button class="s" onclick="chunks('${x.id}')">Chunks</button></td></tr>`);
+}
+async function docStatus(id, status) { await api(`/documents/${id}`, {method: "PATCH", body: JSON.stringify({status})}); toast(`${id} → ${status}`); loadDocuments(); }
+async function reindex(id) { await api(`/documents/${id}/reindex`, {method: "POST"}); toast("Reindexing in the background; refresh in a minute"); loadDocuments(); }
+async function chunks(id) {
+  const list = await api(`/documents/${id}/chunks?limit=200`), el = document.getElementById("chunkview");
+  el.style.display = "block";
+  el.innerHTML = `<b>How “${esc(id)}” was split (${list.length} chunks)</b> <button class="s" onclick="this.parentNode.style.display='none'">Close</button>` +
+    list.map(c => `<div style="margin-top:8px"><b>${esc(c.section_ref)}</b> <span class="meta">p.${c.page_start}${c.page_end !== c.page_start ? "-" + c.page_end : ""} ${esc(c.chapter || "")}</span><div class="meta">${esc(c.heading || "")}</div><pre>${esc(c.text)}</pre></div>`).join("");
+  el.scrollIntoView({behavior: "smooth"});
+}
+document.getElementById("upload").onsubmit = async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target); for (const [k, v] of [...fd.entries()]) if (v === "") fd.delete(k);
+  const r = await api("/documents", {method: "POST", body: fd});
+  toast(`Uploaded as ${r.id}. Indexing… (draft until published)`); e.target.reset(); loadDocuments();
+};
+
+// ---------------- cases
+async function loadCases() {
+  const st = document.getElementById("casestatus").value, rel = document.getElementById("caserel").value;
+  const list = await api(`/cases?limit=100&relevance=${rel}${st ? "&status=" + st : ""}`);
+  const pri = p => `<span class="pill ${p === "urgent" || p === "high" ? "bad" : ""}">${esc(p)}</span>`;
+  rows("casetable", ["Priority", "Reference", "Type", "Summary", "Triage", "Status", "Routed to", "Assigned", "Created", ""], list, c => `<tr><td>${pri(c.triage_priority)}</td><td><b>${esc(c.reference_number)}</b></td><td>${esc(c.type)}</td>
+    <td>${esc(c.summary)} ${c.anonymous ? '<span class="pill">anonymous</span>' : ""}${c.confidential ? ' <span class="pill bad">confidential</span>' : ""}</td>
+    <td><span class="pill ${c.triage_relevance === "spam" ? "bad" : c.triage_relevance === "relevant" ? "ok" : ""}">${esc(c.triage_relevance)}</span><div class="meta">${esc(c.triage_reason)} (${esc(c.triage_by)})</div></td>
+    <td><span class="pill">${esc(c.status)}</span></td><td>${esc(c.routed_to)}</td><td>${esc(c.assigned_to)}</td><td>${fmt(c.created_at)}</td>
+    <td><button class="s" onclick="openCase('${c.reference_number}')">Open</button></td></tr>`);
+  const routing = await api("/cases/routing");
+  rows("routing", ["Case type", "Routed to", "Expected response"], routing, r => `<tr><td>${esc(r.case_type)}</td><td>${esc(r.routed_to)}</td><td>${esc(r.expected_response_time)}</td></tr>`);
+}
+async function openCase(ref) {
+  const c = await api(`/cases/${ref}`), el = document.getElementById("casedetail");
+  el.style.display = "block";
+  const q = (c.details && (c.details.question || c.details.description || c.details.topic || c.details.request)) || c.summary;
+  el.innerHTML = `<b>${esc(c.reference)}</b> · ${esc(c.case_type)} · <span class="pill">${esc(c.status)}</span>
+    · triage <span class="pill ${c.triage_relevance === "spam" ? "bad" : "ok"}">${esc(c.triage_relevance)}</span> <span class="pill">${esc(c.triage_priority)}</span>
+    <span class="meta">${esc(c.triage_reason)} (by ${esc(c.triage_by)})</span>
+    <p>${esc(c.summary)}</p>
+    <div class="row"><div style="flex:1"><b>Details</b><pre>${esc(JSON.stringify(c.details, null, 2))}</pre></div>
+    <div style="flex:1"><b>Contact</b><pre>${c.contact ? esc(JSON.stringify(c.contact, null, 2)) : "anonymous / none"}</pre></div></div>
+    <b>Conversation excerpt</b>${(c.conversation_excerpt || []).map(m => `<div class="msg ${m.role}">${esc(m.content)}</div>`).join("") || '<div class="meta">none</div>'}
+    <b>Audit trail</b><table>${c.events.map(e => `<tr><td>${fmt(e.created_at)}</td><td>${esc(e.event)}</td><td>${esc(e.actor)}</td><td>${esc(e.note)}</td></tr>`).join("")}</table>
+    <div class="row" style="margin-top:10px">
+      <select id="cs_status">${["", "assigned", "in_progress", "waiting_for_user", "resolved", "closed"].map(s => `<option value="${s}">${s || "(keep status)"}</option>`).join("")}</select>
+      <input id="cs_assign" placeholder="Assign to (officer)"> <input id="cs_note" placeholder="Note" size="30"> <input id="cs_actor" placeholder="Your name *">
+      <select id="cs_rel"><option value="">(keep triage)</option><option value="relevant">mark relevant</option><option value="unclear">mark unclear</option><option value="spam">mark spam</option></select>
+      <select id="cs_pri"><option value="">(keep priority)</option><option>urgent</option><option>high</option><option>normal</option><option>low</option></select>
+      <button class="b" onclick="updateCase('${c.reference}')">Update</button></div>
+    <div class="row"><button class="s" data-type="case" data-ref="${esc(c.reference)}" data-q="${esc(q)}" data-cat="" onclick="answerFrom(this.dataset)">Write an official FAQ answer from this case</button>
+      <span class="meta">(for questions many people ask; the reply to this person goes through the case itself)</span></div>`;
+  el.scrollIntoView({behavior: "smooth"});
+}
+async function updateCase(ref) {
+  const v = id => document.getElementById(id).value.trim() || undefined;
+  if (!v("cs_actor")) { toast("Enter your name"); return; }
+  await api(`/cases/${ref}`, {method: "PATCH", body: JSON.stringify({status: v("cs_status"), assigned_to: v("cs_assign"), note: v("cs_note"),
+    triage_relevance: v("cs_rel"), triage_priority: v("cs_pri"), actor: v("cs_actor")})});
+  toast("Case updated"); openCase(ref); loadCases();
+}
+
+// ---------------- FAQ answers
+function answerFrom(d) {
+  resetFaq();
+  document.getElementById("f_source_type").value = d.type; document.getElementById("f_source_ref").value = d.ref;
+  document.getElementById("f_source").textContent = `From ${d.type === "gap" ? "knowledge gap #" : "case "}${d.ref}`;
+  document.getElementById("f_question").value = d.q; document.getElementById("f_category").value = d.cat || "";
+  show("faq"); document.getElementById("f_answer").focus();
+}
+function resetFaq() {
+  for (const id of ["f_id", "f_source_ref", "f_question", "f_answer", "f_owner", "f_review"]) document.getElementById(id).value = "";
+  document.getElementById("f_source_type").value = "manual"; document.getElementById("f_source").textContent = "";
+  document.getElementById("f_category").value = ""; document.getElementById("faqformtitle").textContent = "Write an official answer";
+}
+async function saveFaq() {
+  const v = id => document.getElementById(id).value.trim();
+  if (!v("f_question") || !v("f_answer") || !v("f_owner") || !v("f_by")) { toast("Question, answer, owner and your name are required"); return; }
+  const body = {question: v("f_question"), answer: v("f_answer"), category: v("f_category") || null, owner: v("f_owner"), review_date: v("f_review") || null};
+  if (v("f_id")) await api(`/faq/${v("f_id")}`, {method: "PATCH", body: JSON.stringify({...body, actor: v("f_by")})});
+  else await api("/faq", {method: "POST", body: JSON.stringify({...body, created_by: v("f_by"), source_type: v("f_source_type"), source_ref: v("f_source_ref") || null})});
+  toast("Saved as draft. A different staff member must publish it."); resetFaq(); loadFaq();
+}
+let faqCache = [];
+async function loadFaq() {
+  const st = document.getElementById("faqstatus").value; faqCache = await api(`/faq${st ? "?status=" + st : ""}`);
+  rows("faqtable", ["#", "Question / answer", "Status", "Written by", "Approved by", "Source", ""], faqCache, f => `<tr><td>${f.id}</td>
+    <td><b>${esc(f.question)}</b><div style="white-space:pre-wrap">${esc(f.answer)}</div><div class="meta">${esc(f.category || "")} · owner ${esc(f.owner)}${f.review_date ? " · review " + f.review_date : ""}</div></td>
+    <td><span class="pill ${f.status === "active" ? "ok" : f.status === "retired" ? "bad" : ""}">${f.status}</span></td>
+    <td>${esc(f.created_by)}</td><td>${esc(f.approved_by || "")}</td><td class="meta">${esc(f.source_type)} ${esc(f.source_ref || "")}</td>
+    <td style="white-space:nowrap">${f.status === "draft" ? `<button class="b" onclick="publishFaq(${f.id})">Publish</button> ` : ""}
+      ${f.status !== "retired" ? `<button class="s" onclick="editFaq(${f.id})">Edit</button> <button class="s" onclick="retireFaq(${f.id})">Retire</button>` : ""}</td></tr>`);
+}
+function editFaq(id) {
+  const f = faqCache.find(x => x.id === id); resetFaq();
+  document.getElementById("f_id").value = id; document.getElementById("f_question").value = f.question; document.getElementById("f_answer").value = f.answer;
+  document.getElementById("f_category").value = f.category || ""; document.getElementById("f_owner").value = f.owner; document.getElementById("f_review").value = f.review_date || "";
+  document.getElementById("faqformtitle").textContent = `Edit FAQ #${id}` + (f.status === "active" ? " (saving takes it offline until re-approved)" : "");
+  document.getElementById("faqform").scrollIntoView({behavior: "smooth"});
+}
+async function publishFaq(id) {
+  const by = prompt("Your name (must be different from the author):"); if (!by) return;
+  await api(`/faq/${id}/publish`, {method: "POST", body: JSON.stringify({actor: by})}); toast(`FAQ #${id} is live: the bot can now cite it`); loadFaq();
+}
+async function retireFaq(id) {
+  const by = prompt("Your name:"); if (!by) return;
+  await api(`/faq/${id}/retire`, {method: "POST", body: JSON.stringify({actor: by})}); toast(`FAQ #${id} retired`); loadFaq();
+}
+
+// ---------------- settings
+async function loadSettings() {
+  const s = await api("/settings");
+  document.getElementById("settingsjson").value = JSON.stringify(s.editable, null, 2);
+  document.getElementById("readonly").textContent = JSON.stringify(s.read_only, null, 2);
+}
+async function saveSettings() {
+  let values; try { values = JSON.parse(document.getElementById("settingsjson").value); } catch { toast("Invalid JSON"); return; }
+  const by = document.getElementById("setby").value.trim(); if (!by) { toast("Enter your name"); return; }
+  await api("/settings", {method: "PUT", body: JSON.stringify({values, updated_by: by})}); toast("Settings saved"); loadSettings();
+}
+
+show("dashboard");
+</script>
+</body>
+</html>

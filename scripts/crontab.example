@@ -1,0 +1,17 @@
+# baza-RMB scheduled jobs. Install for the user that runs the services (adjust the path):
+#   crontab -e    and paste the lines below
+# Logs go to /var/log/baza-rmb-*.log (create them once: sudo touch /var/log/baza-rmb-{backup,purge,web}.log && sudo chown $USER /var/log/baza-rmb-*.log)
+
+BAZA=/opt/baza-rmb
+
+# 02:00 every day: database + documents backup (keeps 14 days in $BAZA/backups; copy them off the server!)
+0 2 * * *  cd $BAZA && scripts/backup.sh >> /var/log/baza-rmb-backup.log 2>&1
+
+# 03:00 every day: delete conversations older than CHAT_RETENTION_DAYS (default 365)
+0 3 * * *  cd $BAZA && docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T ai python -m app.cli purge >> /var/log/baza-rmb-purge.log 2>&1
+
+# 04:00 every Monday: re-read RMB web pages used as sources (geohazards) and re-index them when they changed
+0 4 * * 1  cd $BAZA && docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T ai python -m app.cli refresh-web >> /var/log/baza-rmb-web.log 2>&1
+
+# 05:00 on the 1st of every month: renew Let's Encrypt certificates (only if you use certbot, see docs/DEPLOYMENT.md)
+# 0 5 1 * *  certbot renew --quiet --webroot -w $BAZA/nginx/certbot-webroot --deploy-hook "$BAZA/scripts/install-certs.sh"

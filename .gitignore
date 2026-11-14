@@ -1,0 +1,15 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.cache/
+data/raw/*.pdf
+data/uploads/
+data/eval_results/
+!data/raw/.gitkeep
+backups/
+nginx/certs/
+nginx/certbot-webroot/
+data/ai-service.log
+*.egg-info/

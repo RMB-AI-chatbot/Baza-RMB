@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RMB website (mock) with the baza-RMB assistant</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  :root { --sky:#1a9ad6; --ink:#1d2733; --muted:#6b7785; --line:#e3e8ee; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family: "Inter", system-ui, sans-serif; color:var(--ink); background:#fff; }
+  .gov { background:#f5f7f9; border-bottom:1px solid var(--line); font-size:12.5px; color:#3b4a57; }
+  .gov .in { max-width:1200px; margin:0 auto; padding:7px 24px; display:flex; align-items:center; gap:10px; }
+  .flag { width:22px; height:14px; display:inline-grid; grid-template-rows:2fr 1fr 1fr; border-radius:2px; overflow:hidden; }
+  .flag i:nth-child(1) { background:#20603d; position:relative; } .flag i:nth-child(1) { background:#00a1de; }
+  .flag i:nth-child(2) { background:#fad201; } .flag i:nth-child(3) { background:#20603d; }
+  .gov a { color:#1170b8; text-decoration:none; } .gov .right { margin-left:auto; color:var(--muted); }
+  header.site { border-bottom:1px solid var(--line); }
+  header.site .in { max-width:1200px; margin:0 auto; padding:12px 24px; display:flex; align-items:center; gap:28px; }
+  .brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
+  .brand svg { width:48px; height:48px; }
+  .brand b { display:block; color:var(--sky); font-size:28px; letter-spacing:.5px; line-height:1; font-weight:800; }
+  .brand small { display:block; font-size:11px; font-weight:600; color:#1d2b3a; line-height:1.2; max-width:150px; }
+  nav.main { display:flex; gap:26px; font-size:13.5px; font-weight:700; letter-spacing:.02em; }
+  nav.main a { color:#1d2733; text-decoration:none; } nav.main a.on { color:var(--sky); }
+  .tools { margin-left:auto; display:flex; align-items:center; gap:18px; font-size:13px; font-weight:700; }
+  .tools .social { display:flex; gap:12px; padding-left:16px; border-left:1px solid var(--line); color:#2a3440; }
+  .hero { background: linear-gradient(120deg, #0c3e60 0%, #0c5a89 55%, #1a9ad6 100%); color:#fff; }
+  .hero .in { max-width:1200px; margin:0 auto; padding:72px 24px; }
+  .hero h1 { font-size:38px; margin:0 0 12px; max-width:680px; line-height:1.15; }
+  .hero p { font-size:17px; max-width:620px; opacity:.9; margin:0; }
+  .cards { max-width:1200px; margin:-36px auto 60px; padding:0 24px; display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; box-shadow:0 6px 20px rgba(15,40,60,.06); }
+  .card h3 { margin:0 0 6px; font-size:16px; } .card p { margin:0; color:var(--muted); font-size:14px; }
+  .mock { max-width:1200px; margin:0 auto 40px; padding:0 24px; color:var(--muted); font-size:12.5px; }
+  @media (max-width: 900px) { nav.main, .tools .social { display:none; } .hero h1 { font-size:28px; } }
+</style>
+</head>
+<body>
+  <div class="gov"><div class="in">
+    <span class="flag" aria-hidden="true"><i></i><i></i><i></i></span>
+    A Rwanda Government Website <a href="#">How to identify ▾</a>
+    <span class="right">Official Portal</span>
+  </div></div>
+
+  <header class="site"><div class="in">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <g fill="none" stroke="#2a9fd8" stroke-width="3.2" stroke-linecap="round"><circle cx="24" cy="24" r="14.5"/>
+          <path d="M24 3v4M24 41v4M3 24h4M41 24h4M9 9l3 3M36 36l3 3M39 9l-3 3M12 36l-3 3"/></g>
+        <path d="M24 13c4 5 7 8 7 13a7 7 0 0 1-14 0c0-3 1.5-5 3-6.5.3 2.2 1.2 3.5 2.5 4-.6-4 0-7.5 1.5-10.5z" fill="#f08a24"/>
+      </svg>
+      <span><b>RMB</b><small>Rwanda Mines, Petroleum and Gas Board</small></span>
+    </a>
+    <nav class="main" aria-label="Main">
+      <a class="on" href="#">HOME</a><a href="#">ABOUT ▾</a><a href="#">SERVICES</a><a href="#">OUR WORK ▾</a><a href="#">UPDATES ▾</a><a href="#">SITES &amp; APPS</a>
+    </nav>
+    <div class="tools">
+      <span aria-label="Search">🔍</span><span>ENGLISH ▾</span>
+      <span class="social" aria-hidden="true">f &nbsp;𝕏 &nbsp;in &nbsp;◎ &nbsp;▶</span>
+    </div>
+  </div></header>
+
+  <!-- Plain white page, as in the Figma "Side view": only the RMB header and the assistant. -->
+
+  <!-- baza-RMB assistant: the only line the RMB website (TYPO3) needs -->
+  <script src="/widget/baza-widget.js?v=4" data-api-base="/api/v1" data-lang="en" defer></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+# Production on RMB's server:  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# (use scripts/deploy.sh; see docs/DEPLOYMENT.md)
+services:
+  ai:
+    environment:
+      ENVIRONMENT: production
+    deploy:
+      resources:
+        limits: {memory: 6g}
+
+  cases:
+    deploy:
+      resources:
+        limits: {memory: 512m}
+
+  portal:
+    deploy:
+      resources:
+        limits: {memory: 512m}
+
+  db:
+    deploy:
+      resources:
+        limits: {memory: 2g}
+
+  nginx:
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:?set PUBLIC_HOST in .env, e.g. baza.rmb.gov.rw}
+      PORTAL_HOST: ${PORTAL_HOST:?set PORTAL_HOST in .env, e.g. baza-admin.rmb.gov.rw}
+      MAIN_SITE: ${MAIN_SITE:-https://www.rmb.gov.rw}
+      NGINX_ENVSUBST_FILTER: "^(PUBLIC_HOST|PORTAL_HOST|MAIN_SITE)$$"
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/portal-allow.conf:/etc/nginx/portal-allow.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+      - ./nginx/certbot-webroot:/var/www/certbot:ro
+      - ./web/widget:/usr/share/nginx/html/widget:ro
+    ports:
+      - "${PUBLIC_HTTP_PORT:-80}:80"
+      - "${PUBLIC_HTTPS_PORT:-443}:443"

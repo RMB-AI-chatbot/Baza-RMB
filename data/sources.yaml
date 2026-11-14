@@ -1,0 +1,102 @@
+# Knowledge-base register. One entry per source document.
+# `python -m app.cli ingest --all` syncs these rows into kb.documents and (re)indexes changed files.
+#
+# Governance fields (owner, version, effective_date, review_date) are required by the proposal.
+# Values marked "(to be confirmed)" are placeholders until RMB confirms them.
+# status: draft (not used for answers) | active (used for answers) | retired (kept for audit, not used)
+
+documents:
+  - id: law-072-2024-mining-quarry
+    title: Law n° 072/2024 of 26/06/2024 on mining and quarry operations
+    short_title: Mining and Quarry Law (n° 072/2024)
+    law_reference: Law n° 072/2024 of 26/06/2024
+    doc_type: law
+    category: licensing
+    file: raw/Law_n___0722024of_26062024_on_mining_and_quarry_operations.pdf
+    source_url: https://www.rmb.gov.rw/fileadmin/user_upload/RMB/Publications/Laws/Law_n___0722024of_26062024_on_mining_and_quarry_operations.pdf
+    layout: gazette_trilingual
+    options: {columns: [rw, en, fr]}
+    languages: [en, fr, rw]
+    owner: RMB Legal Unit (to be confirmed)
+    version: Official Gazette n° Special of 24/07/2024
+    effective_date: 2024-07-24
+    review_date: 2027-06-30
+    status: active
+
+  - id: law-056-2024-mineral-tax
+    title: Law n° 056/2024 of 26/06/2024 establishing tax on minerals
+    short_title: Tax on Minerals Law (n° 056/2024)
+    law_reference: Law n° 056/2024 of 26/06/2024
+    doc_type: law
+    category: taxation
+    file: raw/Law_no_0562024of_26062024_establishing_tax_on_minerals.pdf
+    source_url: https://www.rmb.gov.rw/fileadmin/user_upload/RMB/Publications/Laws/Law_no_0562024of_26062024_establishing_tax_on_minerals.pdf
+    layout: gazette_trilingual
+    options: {columns: [rw, en, fr]}
+    languages: [en, fr, rw]
+    owner: RMB Legal Unit (to be confirmed)
+    version: Official Gazette n° Special of 05/07/2024
+    effective_date: 2024-07-05
+    review_date: 2027-06-30
+    status: active
+
+  - id: law-13-2016-petroleum
+    title: Law n° 13/2016 of 02/05/2016 governing petroleum exploration and production activities
+    short_title: Petroleum Law (n° 13/2016)
+    law_reference: Law n° 13/2016 of 02/05/2016
+    doc_type: law
+    category: petroleum_gas
+    file: raw/Petroleum_Law_230628_221132.pdf
+    source_url: https://www.rmb.gov.rw/fileadmin/user_upload/RMB/Publications/Laws/Petroleum_Law_230628_221132.pdf
+    layout: gazette_trilingual
+    options: {columns: [rw, en, fr]}
+    languages: [en, fr, rw]
+    owner: RMB Legal Unit (to be confirmed)
+    version: Official Gazette n° 21 of 23/05/2016
+    effective_date: 2016-05-23
+    review_date: 2027-06-30
+    status: active
+
+  - id: prospectus-lake-kivu-basin
+    title: Lake Kivu Basin - Frontier Exploration Opportunity (investment prospectus)
+    short_title: Lake Kivu Basin Prospectus
+    doc_type: prospectus
+    category: petroleum_gas
+    file: raw/LAKE_KIVU_BASIN_No_Reference.pdf
+    source_url: https://www.rmb.gov.rw/fileadmin/user_upload/RMB/Investment_Prospectus/LAKE_KIVU_BASIN_No_Reference.pdf
+    layout: simple
+    languages: [en]
+    owner: RMB Petroleum and Gas Department (to be confirmed)
+    version: undated (to be confirmed)
+    review_date: 2027-06-30
+    status: active
+
+  - id: prospectus-rmb-investment-2025
+    title: Revised RMB Investment Prospectus (October 2025)
+    short_title: RMB Investment Prospectus (Oct 2025)
+    doc_type: prospectus
+    category: investment
+    file: raw/Revised_RMB_Investment_Prospectus__October_2025.pdf
+    source_url: https://www.rmb.gov.rw/fileadmin/user_upload/RMB/Investment_Prospectus/Revised_RMB_Investment_Prospectus__October_2025.pdf
+    # The PDF's text layer is unusable (fonts without Unicode mapping): pages are OCR'd.
+    layout: ocr
+    languages: [en]
+    owner: RMB Investment Promotion (to be confirmed)
+    version: October 2025
+    effective_date: 2025-10-01
+    review_date: 2026-12-31
+    status: active
+
+  - id: web-geohazards-monitoring
+    title: RMB Geohazards Monitoring (web page)
+    short_title: Geohazards Monitoring page
+    doc_type: webpage
+    category: health_safety
+    source_url: https://www.rmb.gov.rw/geohazardsmonitoring
+    file: raw/geohazardsmonitoring.html   # snapshot, refreshed by `python -m app.cli refresh-web`
+    layout: webpage
+    languages: [en]
+    owner: RMB Geology / Geohazards unit (to be confirmed)
+    version: live page
+    review_date: 2026-12-31
+    status: active

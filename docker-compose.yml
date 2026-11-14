@@ -1,0 +1,108 @@
+# baza-RMB services. This base file opens no ports; add one of:
+#   development (automatic):  docker compose up -d            (+ docker-compose.override.yml)
+#   production:               docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#                             (scripts/deploy.sh does this for you)
+name: baza-rmb
+
+x-logging: &logging
+  driver: json-file
+  options: {max-size: "20m", max-file: "5"}
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-baza}
+      POSTGRES_USER: ${POSTGRES_USER:-baza}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-baza} -d ${POSTGRES_DB:-baza}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  ai:
+    build: ./ai-service
+    restart: unless-stopped
+    logging: *logging
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-baza}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-baza}
+      CASE_SERVICE_URL: http://cases:80
+      DATA_DIR: /data
+      MODEL_CACHE_DIR: /models
+      TRUST_PROXY: "true"
+      SERVE_TEST_PAGE: "false"
+    volumes:
+      - ./data:/data
+      - models:/models
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=4).status == 200 else 1)"]
+      interval: 30s
+      timeout: 6s
+      retries: 3
+      start_period: 600s   # first start downloads the embedding model (~2.2 GB)
+
+  cases:
+    build:
+      context: ./case-service
+      args: {DEBIAN_MIRROR: "${DEBIAN_MIRROR:-}"}
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      DB_DSN: pgsql:host=db;port=5432;dbname=${POSTGRES_DB:-baza}
+      DB_USER: ${POSTGRES_USER:-baza}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      CASE_SERVICE_TOKEN: ${CASE_SERVICE_TOKEN:?set CASE_SERVICE_TOKEN in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "80"
+    # Never published: only the AI service and the admin portal call it.
+
+  portal:
+    # Staff dashboard. Production: reached through nginx on PORTAL_HOST, limited by nginx/portal-allow.conf.
+    build:
+      context: ./admin-portal
+      args: {DEBIAN_MIRROR: "${DEBIAN_MIRROR:-}"}
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      DB_DSN: pgsql:host=db;port=5432;dbname=${POSTGRES_DB:-baza}
+      DB_USER: ${POSTGRES_USER:-baza}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      AI_ADMIN_URL: http://ai:8000/api/v1/admin
+      ADMIN_API_KEY: ${ADMIN_API_KEY:?set ADMIN_API_KEY in .env}
+      PORTAL_ADMIN_EMAIL: ${PORTAL_ADMIN_EMAIL:-}
+      PORTAL_ADMIN_PASSWORD: ${PORTAL_ADMIN_PASSWORD:-}
+      PORTAL_ADMIN_NAME: ${PORTAL_ADMIN_NAME:-RMB Administrator}
+      PORTAL_SESSION_MINUTES: ${PORTAL_SESSION_MINUTES:-30}
+      PORTAL_REQUIRE_2FA: ${PORTAL_REQUIRE_2FA:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "80"
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    logging: *logging
+    depends_on:
+      - ai
+      - portal
+
+volumes:
+  pgdata:
+  models:
