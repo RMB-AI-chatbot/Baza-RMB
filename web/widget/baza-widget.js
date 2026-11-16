@@ -27,7 +27,7 @@
     en: {
       org: "Rwanda Mines, Petroleum and Gas Board", sub: "AI Assistant", ask: "Here are some things you can ask me:",
       placeholder: "Type your message...", footer: "AI can make mistakes. Please verify from official resources.",
-      open: "Open the RMB assistant", close: "Close the assistant", send: "Send", language: "Language", newChat: "New conversation",
+      hello: "Hi 👋 I'm", open: "Open the RMB assistant", close: "Close the assistant", send: "Send", language: "Language", newChat: "New conversation",
       sources: "Sources", helpful: "Was this helpful?", thanks: "Thank you for your feedback.",
       anonymous: "Stay anonymous", confidential: "Your report is confidential.", submit: "Submit", check: "Check status",
       sending: "Sending…", required: "Please fill in the required fields.", copy: "Copy", copied: "Copied",
@@ -39,7 +39,7 @@
     fr: {
       org: "Office rwandais des mines, du pétrole et du gaz", sub: "Assistant IA", ask: "Voici quelques questions que vous pouvez me poser :",
       placeholder: "Écrivez votre message...", footer: "L'IA peut se tromper. Vérifiez auprès des sources officielles.",
-      open: "Ouvrir l'assistant RMB", close: "Fermer l'assistant", send: "Envoyer", language: "Langue", newChat: "Nouvelle conversation",
+      hello: "Bonjour 👋 je suis", open: "Ouvrir l'assistant RMB", close: "Fermer l'assistant", send: "Envoyer", language: "Langue", newChat: "Nouvelle conversation",
       sources: "Sources", helpful: "Cette réponse vous a-t-elle aidé ?", thanks: "Merci pour votre avis.",
       anonymous: "Rester anonyme", confidential: "Votre signalement est confidentiel.", submit: "Envoyer", check: "Vérifier",
       sending: "Envoi…", required: "Veuillez remplir les champs obligatoires.", copy: "Copier", copied: "Copié",
@@ -51,7 +51,7 @@
     rw: {
       org: "Urwego rw'Igihugu rushinzwe Mine, Peteroli na Gaz", sub: "Umufasha wa AI", ask: "Dore ibyo ushobora kumbaza:",
       placeholder: "Andika ubutumwa bwawe...", footer: "AI ishobora kwibeshya. Genzura mu nyandiko z'ubuyobozi.",
-      open: "Fungura umufasha wa RMB", close: "Funga umufasha", send: "Ohereza", language: "Ururimi", newChat: "Ikiganiro gishya",
+      hello: "Muraho 👋 ndi", open: "Fungura umufasha wa RMB", close: "Funga umufasha", send: "Ohereza", language: "Ururimi", newChat: "Ikiganiro gishya",
       sources: "Aho byavuye", helpful: "Iki gisubizo cyagufashije?", thanks: "Murakoze ku gitekerezo cyanyu.",
       anonymous: "Ntushaka kumenyekana", confidential: "Amakuru utanze ni ibanga.", submit: "Ohereza", check: "Reba",
       sending: "Biroherezwa…", required: "Uzuza ibisabwa byose.", copy: "Kopiya", copied: "Byakopowe",
@@ -87,14 +87,25 @@
     doc: svg(H.doc, 18), shield: svg(H.shield, 18), book: svg(H.book, 18), chart: svg(H.chart, 18), phone: svg(H.phone, 16),
     up: svg(H.thumb, 15), down: `<span style="display:inline-flex;transform:rotate(180deg)">${svg(H.thumb, 15)}</span>`, alert: svg(H.alert, 18),
   };
-  // RMB mark (placeholder drawing: replace with the official logo file when available)
-  const LOGO = `<svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true">
-    <g fill="none" stroke="#2a9fd8" stroke-width="3.2" stroke-linecap="round">
+  // RMB mark drawn inline: the white version sits on the blue launcher (Figma), the blue one is the
+  // fallback when the official logo file (rmb-logo.png next to this script, or data-logo) is missing.
+  const mark = (gear, inner) => `<svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true">
+    <g fill="none" stroke="${gear}" stroke-width="3.2" stroke-linecap="round">
       ${Array.from({length: 10}, (_, i) => { const a = (i * 36 - 90) * Math.PI / 180;
         return `<line x1="${24 + 17 * Math.cos(a)}" y1="${24 + 17 * Math.sin(a)}" x2="${24 + 21 * Math.cos(a)}" y2="${24 + 21 * Math.sin(a)}"/>`; }).join("")}
       <circle cx="24" cy="24" r="14.5"/></g>
     <path d="M24 13c4 5 7 8 7 13a7 7 0 0 1-14 0c0-3 1.5-5 3-6.5.3 2.2 1.2 3.5 2.5 4-.6-4 0-7.5 1.5-10.5z" fill="#f08a24"/>
-    <path d="M24 23c1.8 2 3 3.4 3 5.2a3 3 0 0 1-6 0c0-1.6 1.2-3 3-5.2z" fill="#fff"/></svg>`;
+    <path d="M24 23c1.8 2 3 3.4 3 5.2a3 3 0 0 1-6 0c0-1.6 1.2-3 3-5.2z" fill="${inner}"/></svg>`;
+  const LOGO_SVG = mark("#2a9fd8", "#fff"), LOGO_WHITE = mark("#fff", "#1670e0");
+  const LOGO_URL = (script && script.dataset.logo) || (script && script.src ? new URL("rmb-logo.png", script.src).href : "");
+  const LOGO_WHITE_URL = (script && script.dataset.logoWhite) || (script && script.src ? new URL("rmb-logo-white.png", script.src).href : "");
+  const img = (url, cls) => `<img class="${cls}" src="${url.replace(/[<>"]/g, encodeURIComponent)}" alt="">`;
+  const LOGO = LOGO_URL ? img(LOGO_URL, "mark") : LOGO_SVG;
+  // Launcher shape: circle with a speech-bubble tail at the bottom right (Figma), blue gradient.
+  const BUBBLE = `<svg class="bub" viewBox="0 0 50 48.48" aria-hidden="true"><defs><linearGradient id="bzg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#2b95f6"/><stop offset="1" stop-color="#0a4fd1"/></linearGradient></defs>
+    <path fill="url(#bzg)" d="M24 0.5a23.5 23.5 0 1 0 15.6 41.1L49.5 48 44.35 35.75A23.5 23.5 0 0 0 24 0.5z"/></svg>`;
+  const LAUNCHER_LOGO =LOGO_WHITE_URL ? img(LOGO_WHITE_URL, "mark white") : LOGO_WHITE;
 
   if (!document.querySelector("link[data-baza-font]")) {
     const l = document.createElement("link");
@@ -157,11 +168,27 @@
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
   button { font: inherit; cursor: pointer; }
-  .launcher { position: fixed; right: 24px; bottom: 24px; width: 56px; height: 56px; border-radius: 50%; border: 0;
-    background: var(--brand); color: #fff; display: grid; place-items: center; box-shadow: 0 6px 20px rgba(9,70,105,.35);
-    z-index: 2147483000; transition: transform .25s var(--ease), background .2s, box-shadow .25s; }
-  .launcher.spin svg { animation: spin .35s var(--ease); }
-  .launcher:hover { transform: scale(1.06); background: var(--brand-dark); box-shadow: 0 10px 28px rgba(1,97,145,.4); }
+  /* Launcher (Figma): blue speech bubble with the white RMB mark and a green "online" dot; navy circle with X when open. */
+  /* Figma "Baza widget button" (50 x 48.48): gradient speech bubble with its tail at the bottom right, the white RMB mark,
+     and a 10px green dot (#41A42A) at top -2 / left 32. */
+  .launcher { position: fixed; right: 24px; bottom: 24px; width: 50px; height: 48.48px; border: 0; padding: 0; background: none;
+    color: #fff; display: block; z-index: 2147483000; filter: drop-shadow(0 4px 10px rgba(16,94,214,.35));
+    transition: transform .25s var(--ease), filter .25s; transform-origin: 70% 70%; }
+  .launcher .bub { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .launcher .lmark { position: absolute; left: 8px; top: 7.5px; width: 32px; height: 32px; }
+  .launcher .dot { position: absolute; top: -2px; left: 32px; width: 10px; height: 10px; border-radius: 50%; background: #41a42a; }
+  .launcher:hover { transform: scale(1.08); filter: drop-shadow(0 8px 16px rgba(16,94,214,.42)); }
+  .launcher.open { width: 56px; height: 56px; border-radius: 50%; background: var(--brand-dark); display: grid; place-items: center;
+    filter: none; box-shadow: 0 6px 20px rgba(9,70,105,.35); }
+  .launcher.open:hover { background: var(--brand); transform: scale(1.06); }
+  .launcher.spin svg, .launcher.spin .lmark { animation: spin .35s var(--ease); }
+  /* Hover greeting (Figma): white pill "Hi 👋 I'm Baza-RMB" slides out to the left of the closed launcher. */
+  .hello { position: fixed; right: 84px; bottom: 28px; background: #fff; color: var(--ink); border-radius: 12px; padding: 9px 18px;
+    font-size: 14px; line-height: 20px; white-space: nowrap; box-shadow: 0 2px 10px rgba(15,35,55,.12); border: 1.5px solid #d3dce5;
+    z-index: 2147483000; pointer-events: none; opacity: 0; transform: translateX(10px); transition: opacity .2s ease, transform .25s var(--ease); }
+  .hello b { font-weight: 700; }
+  .launcher:not(.open):hover ~ .hello, .launcher:not(.open):focus-visible ~ .hello { opacity: 1; transform: none; }
+  img.mark { width: 100%; height: 100%; object-fit: contain; display: block; }
   .launcher:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible { outline: 3px solid #8cc8ea; outline-offset: 2px; }
   .panel { position: fixed; right: 24px; bottom: 92px; width: 380px; height: min(640px, calc(100vh - 120px)); background: var(--bg);
     border-radius: 22px; box-shadow: 0 18px 50px rgba(15,35,55,.28); display: flex; flex-direction: column; overflow: hidden;
@@ -257,6 +284,7 @@
     .panel { right: 0; bottom: 0; width: 100vw; height: 100dvh; border-radius: 0; }
     .launcher { right: 16px; bottom: 16px; }
     .panel:not([hidden]) ~ .launcher { display: none; }
+    .hello { right: 76px; bottom: 20px; }
     .hbtn.closeb { display: inline-flex; }
   }`;
 
@@ -297,7 +325,12 @@
           </div>
           <div class="foot"></div>
         </section>
-        <button class="launcher" type="button" aria-expanded="false"></button>`;
+        <button class="launcher" type="button" aria-expanded="false"></button>
+        <div class="hello" aria-hidden="true"></div>`;
+      // Official logo missing or blocked: fall back to the drawn mark (error events don't bubble, so capture).
+      this.root.addEventListener("error", (e) => {
+        if (e.target.matches && e.target.matches("img.mark")) e.target.outerHTML = e.target.classList.contains("white") ? LOGO_WHITE : LOGO_SVG;
+      }, true);
       this.$ = (s) => this.root.querySelector(s);
       this.panel = this.$(".panel");
       this.log = this.$(".log");
@@ -342,6 +375,7 @@
       this.$(".lang").setAttribute("aria-label", this.t("language")); this.$(".lang").title = this.t("language");
       this.$(".foot").textContent = this.t("footer");
       this.$(".closeb").setAttribute("aria-label", this.t("close"));
+      this.$(".hello").innerHTML = `${esc(this.t("hello"))} <b>${esc(this.name())}</b>`;
       this.syncLauncher();
       const langs = (this.config && this.config.languages) || ["en"];
       this.$(".menu").innerHTML = langs.map((l) =>
@@ -350,8 +384,10 @@
     }
 
     syncLauncher() {
-      const l = this.$(".launcher"), open = !this.panel.hidden;
-      l.innerHTML = open ? ICON.close : ICON.headset;
+      // From the state, not panel.hidden: while the close animation runs the panel is still visible.
+      const l = this.$(".launcher"), open = !!this.state.open;
+      l.innerHTML = open ? ICON.close : `${BUBBLE}<span class="lmark">${LAUNCHER_LOGO}</span><span class="dot"></span>`;
+      l.classList.toggle("open", open);
       l.classList.remove("spin"); void l.offsetWidth; l.classList.add("spin");
       l.setAttribute("aria-label", open ? this.t("close") : this.t("open"));
       l.setAttribute("aria-expanded", String(open));
