@@ -9,7 +9,7 @@ questions:
   # ------------------------------------------------------------ mining & quarry law
   - id: m01
     q: What types of mining licences exist in Rwanda?
-    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-7]]}
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-7], [web-licensing, null]]}
   - id: m02
     q: How long is a mining licence valid?
     expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-13]]}
@@ -338,3 +338,38 @@ questions:
   - id: e19
     q: Uruhushya rw'ubucukuzi rumara igihe kingana iki?
     expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-13]]}
+
+  # ------------------------------------------------------------ rmb.gov.rw pages (added 2026-11-16)
+  - id: web01
+    q: How do I get an ICGLR certificate for a mineral export?
+    expect: {type: answer, sources: [[web-sites-apps, null]], must_include: ["MCIS"]}
+  - id: web02
+    q: Where do I apply for a mining licence online?
+    expect: {type: answer, sources: [[web-sites-apps, null], [web-licensing, null]], must_include: ["GIMCS"]}
+  - id: web03
+    q: Who is the CEO of RMB?
+    expect: {type: answer, sources: [[web-management, null]], must_include: ["Uwase"]}
+  - id: web04
+    q: Where is the RMB laboratory and what does it test?
+    expect: {type: answer, sources: [[web-laboratory, null]], must_include: ["Kicukiro"]}
+  - id: web05
+    q: What happens to a mine that fails an RMB inspection?
+    expect: {type: answer, sources: [[web-inspection, null]]}
+  - id: web06
+    q: Who issues commercial small-scale quarry licences?
+    expect: {type: answer, sources: [[web-licensing, null], [law-072-2024-mining-quarry, art-29]], must_include: ["district"]}
+  - id: web07
+    q: What does RMB do?
+    expect: {type: answer, sources: [[web-about, null], [web-services, null]]}
+  - id: web08
+    q: How does the traceability system for tin, tantalum and tungsten work?
+    expect: {type: answer, sources: [[web-traceability, null]]}
+  - id: web09
+    q: How can I send mineral samples abroad for testing?
+    expect: {type: answer, sources: [[web-laboratory, null]]}
+  - id: web10
+    q: Ni nde uyobora RMB?
+    expect: {type: answer, sources: [[web-management, null]]}
+  - id: geo01
+    q: I need the geological map of Rutsiro district, please send it to me
+    expect: {type: intent, intent: geodata_request, action: form}

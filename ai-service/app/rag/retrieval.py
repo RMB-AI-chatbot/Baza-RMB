@@ -122,6 +122,8 @@ _LEGAL_SYNONYMS = [
     (re.compile(r"\b(community|communities|villagers?|neighbou?rs?)\b", re.I), "development social welfare district"),
     (re.compile(r"\b(when|deadline|due)\b.{0,30}\b(pay|declare)\w*", re.I), "declaration payment within days"),
     (re.compile(r"\bexport tax|raw (form|minerals)|unprocessed\b", re.I), "export tax raw form"),
+    (re.compile(r"\b(online|portal|website|internet|e-?service|system)\b", re.I), "GIMCS MCIS online portal"),
+    (re.compile(r"\b(samples?|laborator\w*|lab|assay\w*|analys\w*|test(ing)?)\b", re.I), "laboratory sample export permit testing"),
 ]
 
 

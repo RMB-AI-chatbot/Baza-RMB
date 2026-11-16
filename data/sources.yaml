@@ -100,3 +100,173 @@ documents:
     version: live page
     review_date: 2026-12-31
     status: active
+
+  # ------------------------------------------------------------ rmb.gov.rw public pages (added 2026-11-16)
+  # Snapshots in data/raw/web-*.html; `python -m app.cli refresh-web` re-downloads them and re-indexes changes.
+  - id: web-about
+    title: About RMB - Overview (rmb.gov.rw)
+    short_title: RMB website - About
+    doc_type: webpage
+    category: general
+    source_url: https://www.rmb.gov.rw/about/overview
+    file: raw/web-about.html
+    layout: webpage
+    languages: [en]
+    owner: RMB Communications (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
+
+  - id: web-management
+    title: RMB Management (rmb.gov.rw)
+    short_title: RMB website - Management
+    doc_type: webpage
+    category: general
+    source_url: https://www.rmb.gov.rw/management
+    file: raw/web-management.html
+    layout: webpage
+    languages: [en]
+    owner: RMB Communications (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
+
+  - id: web-services
+    title: RMB Services (rmb.gov.rw)
+    short_title: RMB website - Services
+    doc_type: webpage
+    category: general
+    source_url: https://www.rmb.gov.rw/services
+    file: raw/web-services.html
+    layout: webpage
+    languages: [en]
+    owner: RMB Communications (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
+
+  - id: web-licensing
+    title: Licensing services (rmb.gov.rw)
+    short_title: RMB website - Licensing
+    doc_type: webpage
+    category: licensing
+    source_url: https://www.rmb.gov.rw/1/licensing
+    file: raw/web-licensing.html
+    layout: webpage
+    languages: [en]
+    owner: RMB Licensing (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
+
+  - id: web-sites-apps
+    title: RMB online portals - MCIS, GIMCS and others (rmb.gov.rw)
+    short_title: RMB website - Online portals
+    doc_type: webpage
+    category: licensing
+    source_url: https://www.rmb.gov.rw/sites-apps-1
+    file: raw/web-sites-apps.html
+    layout: webpage
+    languages: [en]
+    owner: RMB ICT (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
+
+  - id: web-mineral-exploration
+    title: Mineral exploration services (rmb.gov.rw)
+    short_title: RMB website - Mineral exploration
+    doc_type: webpage
+    category: geology
+    source_url: https://www.rmb.gov.rw/1/mineral-petroleum-and-gas
+    file: raw/web-mineral-exploration.html
+    layout: webpage
+    languages: [en]
+    owner: RMB Mines, Petroleum and Gas Exploration (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
+
+  - id: web-mineral-processing
+    title: Mineral extraction and processing (rmb.gov.rw)
+    short_title: RMB website - Extraction and processing
+    doc_type: webpage
+    category: investment
+    source_url: https://www.rmb.gov.rw/1/mineral-processing
+    file: raw/web-mineral-processing.html
+    layout: webpage
+    languages: [en]
+    owner: RMB Mining Operations (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
+
+  - id: web-laboratory
+    title: Mineral sample testing - RMB Geoscience Laboratory (rmb.gov.rw)
+    short_title: RMB website - Geoscience Laboratory
+    doc_type: webpage
+    category: geology
+    source_url: https://www.rmb.gov.rw/1/mineral-sample-testing
+    file: raw/web-laboratory.html
+    layout: webpage
+    languages: [en]
+    owner: RMB Geoscience Laboratory (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
+
+  - id: web-traceability
+    title: Mineral traceability (rmb.gov.rw)
+    short_title: RMB website - Mineral traceability
+    doc_type: webpage
+    category: mineral_trading
+    source_url: https://www.rmb.gov.rw/1/mineral-traceability
+    file: raw/web-traceability.html
+    layout: webpage
+    languages: [en]
+    owner: RMB Mineral Trading and Traceability (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
+
+  - id: web-investment-opportunities
+    title: Mining investment opportunities (rmb.gov.rw)
+    short_title: RMB website - Investment opportunities
+    doc_type: webpage
+    category: investment
+    source_url: https://www.rmb.gov.rw/1/mining-auditing
+    file: raw/web-investment-opportunities.html
+    layout: webpage
+    languages: [en]
+    owner: RMB Investment Promotion (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
+
+  - id: web-inspection
+    title: Mining inspection (rmb.gov.rw)
+    short_title: RMB website - Mining inspection
+    doc_type: webpage
+    category: health_safety
+    source_url: https://www.rmb.gov.rw/1/mining-inspection
+    file: raw/web-inspection.html
+    layout: webpage
+    languages: [en]
+    owner: RMB Inspection and Enforcement (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
+
+  - id: web-projects
+    title: RMB completed projects (rmb.gov.rw)
+    short_title: RMB website - Projects
+    doc_type: webpage
+    category: geology
+    source_url: https://www.rmb.gov.rw/completed-projects
+    file: raw/web-projects.html
+    layout: webpage
+    languages: [en]
+    owner: RMB Communications (to be confirmed)
+    version: live page
+    review_date: 2027-05-31
+    status: active
