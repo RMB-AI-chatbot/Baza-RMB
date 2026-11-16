@@ -8,7 +8,7 @@ Pipeline (each step can end the turn early):
   4. Intent dispatch:
        emergency            -> contacts
        complaint/report/... -> case-intake form                               (forms.py)
-       legal_interpretation -> relevant provisions + handover form, no generation
+       legal_interpretation -> general answer from the documents + "an officer must assess your case" + form
        greeting/out_of_scope/abusive -> fixed text
        question             -> 5
   5. Hybrid retrieval; weak evidence    -> "not covered" + enquiry form, logged as unanswered
@@ -199,23 +199,21 @@ class ChatService:
             async for ev in self._finish(result, started, route):
                 yield ev
             return
-        if route.intent == "legal_interpretation":
-            res = await retrieve(route.standalone_question, languages=["en"], top_k=4)
-            res.chunks = await localize(res.chunks, ans_lang)
-            result.action = "handover"
-            result.answer = t("legal_handover", ans_lang)
-            result.sources = _sources_for(res.chunks[:3], set()) if res.confident else []
-            result.disclaimer = t("disclaimer", ans_lang)
-            result.form = forms.form_payload("legal_question", {"question": message}, ans_lang)
-            async for ev in self._finish(result, started, route, top_score=res.max_vector_score):
-                yield ev
-            return
+        # A question about the person's own situation ("am I in trouble if...", "can I mine on my land?"):
+        # explain what the documents say in general, then say an RMB officer must assess their case and
+        # offer the legal-question form. Many general questions are phrased this way, so refusing outright
+        # (as before) left people with no answer at all.
+        personal = route.intent == "legal_interpretation"
 
         # --- 5. retrieval
         res = await retrieve(route.standalone_question, languages=["en"])
         floor = settings.get("min_vector_score") or self.s.min_vector_score
         confident = res.confident if floor == self.s.min_vector_score else (
             res.max_vector_score >= floor or res.exact_matches > 0)
+        if (not res.chunks or not confident) and personal:
+            async for ev in self._legal_handover(result, started, route, res, ans_lang, message):
+                yield ev
+            return
         if not res.chunks or not confident:
             async for ev in self._not_covered(result, started, route, res, ans_lang, message, "low_confidence"):
                 yield ev
@@ -241,6 +239,9 @@ class ChatService:
             f"{prompts.format_sources(res.chunks)}\n\n"
             f"Question: {message}\n"
             + (f"(Search query used: {route.standalone_question})\n" if route.standalone_question != message else "")
+            + ("(The person is asking about their own situation. Explain only what the sources say in general "
+               "terms. Do not say whether they personally are liable, guilty or allowed: an RMB officer must "
+               "assess their case, and a note saying so is added after your answer.)\n" if personal else "")
         )})
 
         stream = None
@@ -282,11 +283,21 @@ class ChatService:
         if not decided and buf.strip().startswith(NOT_COVERED):
             not_covered = True
         answer = answer.replace(NOT_COVERED, "").strip()
+        if (not_covered or not answer) and personal:
+            async for ev in self._legal_handover(result, started, route, res, ans_lang, message):
+                yield ev
+            return
         if not_covered or not answer:
             async for ev in self._not_covered(result, started, route, res, ans_lang, message, "not_covered",
                                               usage=stream.usage):
                 yield ev
             return
+        if personal:
+            note = NL + NL + t("legal_note", ans_lang)
+            answer += note
+            yield "delta", {"text": note}
+            result.action = "handover"
+            result.form = forms.form_payload("legal_question", {"question": message}, ans_lang)
 
         cited = {int(n) for n in _CITE_RE.findall(answer) if 0 < int(n) <= len(res.chunks)}
         if not cited:
@@ -301,6 +312,17 @@ class ChatService:
             yield ev
 
     # ------------------------------------------------------------------ helpers
+
+    async def _legal_handover(self, result: ChatResult, started: float, route: _Route, res, lang: str, message: str):
+        """Personal legal question the documents do not answer: possibly relevant provisions + the form."""
+        res.chunks = await localize(res.chunks[:4], lang)
+        result.action = "handover"
+        result.answer = t("legal_handover", lang)
+        result.sources = _sources_for(res.chunks[:3], set()) if res.confident else []
+        result.disclaimer = t("disclaimer", lang)
+        result.form = forms.form_payload("legal_question", {"question": message}, lang)
+        async for ev in self._finish(result, started, route, top_score=res.max_vector_score):
+            yield ev
 
     async def _about_assistant(self, result: ChatResult, started: float, route: _Route, hist: list[dict],
                                message: str, lang: str):

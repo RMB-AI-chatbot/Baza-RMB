@@ -109,6 +109,27 @@ def _article_refs(query: str) -> tuple[list[str], str | None]:
     return keys, doc
 
 
+# People's words -> the words the laws use. Added to the KEYWORD part of the search only (the vector
+# search keeps the question as asked). Found by testing expected questions against the laws.
+_LEGAL_SYNONYMS = [
+    (re.compile(r"\b(revok\w*|withdraw\w*|take (it|my licen[cs]e) away|lose my licen[cs]e)\b", re.I), "cancellation cancel suspension"),
+    (re.compile(r"\b(clos(e|es|ing|ure)|stop(s|ping)? mining|give up|abandon\w*|leav(e|ing) the site)\b", re.I), "relinquishment rehabilitation"),
+    (re.compile(r"\b(not|never|didn'?t|don'?t|fail\w*) (to )?start\w*", re.I), "failure start operations cancellation"),
+    (re.compile(r"\b(cost|price|fees?|how much .{0,20}(pay|apply|licen[cs]e))\b", re.I), "service fees regulations"),
+    (re.compile(r"\b(landowner|land-owner|my (land|field|farm|plot|property))\b", re.I), "land owner compensation"),
+    (re.compile(r"\b(smuggl\w*|black market|illegal(ly)? (sell|trad|buy)\w*)\b", re.I), "trading illegally extracted minerals"),
+    (re.compile(r"\b(hire|employ\w*|jobs?|local (people|companies|suppliers|content)|rwandans?)\b", re.I), "local procurement Rwandan contractors"),
+    (re.compile(r"\b(community|communities|villagers?|neighbou?rs?)\b", re.I), "development social welfare district"),
+    (re.compile(r"\b(when|deadline|due)\b.{0,30}\b(pay|declare)\w*", re.I), "declaration payment within days"),
+    (re.compile(r"\bexport tax|raw (form|minerals)|unprocessed\b", re.I), "export tax raw form"),
+]
+
+
+def _keyword_query(query: str) -> str:
+    extra = [terms for rx, terms in _LEGAL_SYNONYMS if rx.search(query)]
+    return f"{query} {' '.join(extra)}" if extra else query
+
+
 _SQL = """
 WITH vec AS (
     SELECT c.id, 1 - (c.embedding <=> %(qvec)s) AS vscore,
@@ -190,7 +211,8 @@ async def retrieve(query: str, languages: list[str] | None = None, top_k: int | 
             await conn.execute("SET LOCAL hnsw.ef_search = 100")
             await conn.execute("SET LOCAL hnsw.iterative_scan = relaxed_order")
             cur = await conn.execute(_SQL, {
-                "qvec": qvec, "langs": languages, "n": s.retrieval_candidates, "cfg": cfg, "q": query,
+                "qvec": qvec, "langs": languages, "n": s.retrieval_candidates, "cfg": cfg,
+                "q": _keyword_query(query) if cfg == "english" else query,
                 "keys": keys or ["__none__"], "doc_hint": doc_hint, "rrf_k": RRF_K, "top_k": top_k,
                 "vw": VECTOR_WEIGHT, "kw": KEYWORD_WEIGHT, "hw": HEADING_WEIGHT,
             })

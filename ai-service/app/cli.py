@@ -110,6 +110,42 @@ def _check_config(args) -> int:
     return 1 if problems else 0
 
 
+def _faq_drafts(args) -> int:
+    """Load prepared FAQ answers as DRAFTS (an RMB officer must check and publish each one in the portal)."""
+    from datetime import date, timedelta
+    from pathlib import Path
+
+    import yaml
+
+    from app import faq
+    from app.db import close_pool
+
+    data = yaml.safe_load(Path(args.file).read_text(encoding="utf-8"))
+    drafts = data.get("drafts") or []
+    review = date.today() + timedelta(days=180)
+
+    async def run():
+        existing = {e["question"].strip().lower() for e in await faq.list_entries(None) if e["status"] != "retired"}
+        added = skipped = 0
+        for d in drafts:
+            if d["question"].strip().lower() in existing:
+                skipped += 1
+                continue
+            await faq.create(question=d["question"], answer=d["answer"].strip(), owner=d.get("owner") or "RMB",
+                             created_by=args.author, category=d.get("category"), review_date=review,
+                             source_type="gap" if d.get("gap") else "manual",
+                             source_ref=str(d["gap"]) if d.get("gap") else None)
+            added += 1
+        await close_pool()
+        return added, skipped
+
+    added, skipped = asyncio.run(run())
+    print(f"{added} FAQ draft(s) added, {skipped} already there. Publish them in the portal: FAQ answers -> Awaiting approval.")
+    for item in data.get("needs_rmb") or []:
+        print(f"  needs an RMB answer: {item}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=get_settings().log_level, format="%(levelname)s %(name)s: %(message)s")
     p = argparse.ArgumentParser(prog="python -m app.cli")
@@ -140,6 +176,11 @@ def main(argv: list[str] | None = None) -> int:
     pp = sub.add_parser("purge", help="delete conversations older than CHAT_RETENTION_DAYS")
     pp.add_argument("--days", type=int)
     pp.set_defaults(fn=_purge)
+
+    pf = sub.add_parser("faq-drafts", help="load prepared FAQ answers as drafts for RMB to review")
+    pf.add_argument("file")
+    pf.add_argument("--author", default="Baza-RMB setup (prepared from the official laws, to be checked)")
+    pf.set_defaults(fn=_faq_drafts)
 
     pc = sub.add_parser("check-config", help="check the settings are safe for production")
     pc.set_defaults(fn=_check_config)

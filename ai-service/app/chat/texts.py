@@ -75,6 +75,14 @@ TEXTS: dict[str, dict[str, str]] = {
         "rw": "Nta makuru mfite kuri iki kibazo mu nyandiko z'ubuyobozi nahawe, bityo sinshaka gukeka. "
               "Ushobora kohereza ikibazo cyawe kuri RMB ukoresheje ifishi iri hasi.",
     },
+    "legal_note": {
+        "en": "This is what the law says in general. Whether and how it applies to your own situation can only be "
+              "assessed by an RMB officer: you can send them your question with the form below.",
+        "fr": "Voici ce que dit la loi de manière générale. Seul un agent de RMB peut dire si et comment elle s'applique "
+              "à votre situation : vous pouvez lui envoyer votre question avec le formulaire ci-dessous.",
+        "rw": "Ibi ni byo itegeko rivuga muri rusange. Uko ryakurikizwa ku kibazo cyawe bwite bisuzumwa n'umukozi wa RMB "
+              "gusa: ushobora kumwoherereza ikibazo cyawe ukoresheje ifishi iri hasi.",
+    },
     "legal_handover": {
         "en": "I can't interpret the law for your specific situation; that needs an RMB officer. "
               "Below are provisions that may be relevant. If you'd like, send your question to RMB's legal team using the form.",

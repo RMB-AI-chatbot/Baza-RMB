@@ -106,7 +106,8 @@ async def eval_full(qs) -> str:
         if e["type"] == "answer":
             cited = {(s["document_id"], None) for s in final["sources"]}
             exp_docs = {d for d, _ in e["sources"]}
-            ok = action == "none" and any(d in exp_docs for d, _ in cited) and "[" in answer
+            # "handover" = answered from the law + "an officer must assess your case" (personal questions)
+            ok = action in ("none", "handover") and any(d in exp_docs for d, _ in cited) and "[" in answer
             flat = re.sub(r"[\s\-‐-― ]+", " ", answer.lower())  # "tax‑clearance" == "tax clearance"
             for frag in e.get("must_include", []):
                 ok = ok and re.sub(r"[\s\-]+", " ", frag.lower()) in flat

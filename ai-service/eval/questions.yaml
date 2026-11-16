@@ -279,3 +279,62 @@ questions:
     turns: ["What is the royalty rate on gold?"]
     q: "who told you that"
     expect: {type: intent, intent: about_assistant, action: none}
+
+  # ------------------------------------------------------------ expected public questions (added 2026-11-16)
+  - id: e01
+    q: What happens if I do not start mining after getting my licence?
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-53]]}
+  - id: e02
+    q: Is a landowner compensated when minerals are mined on his land?
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-4]], must_include: ["compensation"]}
+  - id: e03
+    q: Someone is mining on my land without a licence, am I in trouble if I let them?
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-66]]}
+  - id: e04
+    q: What is the penalty for smuggling minerals?
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-65], [law-072-2024-mining-quarry, art-64]]}
+  - id: e05
+    q: What is the royalty rate on gold?
+    expect: {type: answer, sources: [[law-056-2024-mineral-tax, art-4]], must_include: ["0.5"]}
+  - id: e06
+    q: What is the royalty rate on tin, tantalum and tungsten?
+    expect: {type: answer, sources: [[law-056-2024-mineral-tax, art-4], [law-056-2024-mineral-tax, art-2]], must_include: ["3"]}
+  - id: e07
+    q: When must mining royalties be paid?
+    expect: {type: answer, sources: [[law-056-2024-mineral-tax, art-10]], must_include: ["15"]}
+  - id: e08
+    q: Is there an export tax on raw minerals?
+    expect: {type: answer, sources: [[law-056-2024-mineral-tax, art-5]]}
+  - id: e09
+    q: How long is a commercial small-scale quarry licence valid?
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-30]], must_include: ["five"]}
+  - id: e10
+    q: What safety rules must mining companies follow?
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-42]]}
+  - id: e11
+    q: Must mining companies hire Rwandan contractors?
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-72]]}
+  - id: e12
+    q: What must a company do when it gives up its licence area?
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-26]]}
+  - id: e13
+    q: Can RMB cancel my mining licence?
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-37], [law-072-2024-mining-quarry, art-53]]}
+  - id: e14
+    q: How long is a petroleum production licence valid?
+    expect: {type: answer, sources: [[law-13-2016-petroleum, art-24]]}
+  - id: e15
+    q: How do I contact RMB?
+    expect: {type: answer, sources: [[prospectus-lake-kivu-basin, p11-17]], must_include: ["2930"]}
+  - id: e16
+    q: Quel est le taux de la redevance minière sur l'or ?
+    expect: {type: answer, sources: [[law-056-2024-mineral-tax, art-4]]}
+  - id: e17
+    q: Quelle est la durée de validité d'un permis de recherche minière ?
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-13]]}
+  - id: e18
+    q: Umusoro ku mabuye y'agaciro ungana ute?
+    expect: {type: answer, sources: [[law-056-2024-mineral-tax, art-4]]}
+  - id: e19
+    q: Uruhushya rw'ubucukuzi rumara igihe kingana iki?
+    expect: {type: answer, sources: [[law-072-2024-mining-quarry, art-13]]}

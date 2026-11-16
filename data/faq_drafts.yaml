@@ -1,0 +1,164 @@
+# FAQ drafts prepared from RMB's official documents (Law n° 072/2024 on mining and quarry operations,
+# Law n° 056/2024 on the tax on minerals, RMB prospectuses). Load them as DRAFTS with:
+#     python -m app.cli faq-drafts data/faq_drafts.yaml
+# They are not used by the assistant until an RMB officer checks and publishes each one in the portal
+# (FAQ answers -> Awaiting approval). Text in [RMB: ...] must be completed or removed before publishing.
+# Expected questions people ask that the documents do NOT answer are listed at the end (needs_rmb).
+
+drafts:
+  - question: Someone is mining on my land without a licence. What should I do?
+    category: complaints
+    owner: Inspection and Enforcement
+    gap: 41
+    answer: |
+      Do not allow it and do not confront the people yourself. Report it to RMB:
+      - in this chat, ask to "report illegal mining" and fill in the short form (you can stay anonymous); you get a reference number to follow up;
+      - or call RMB's toll-free line 2930, or write to info@rmb.gov.rw.
+      Why it matters for you as the landowner: under Article 66 of Law n° 072/2024, a person who allows mining on his or her land by someone without a licence commits an offence (1 to 2 years of imprisonment and/or a fine of FRW 25,000,000 to 50,000,000).
+      Mining without a licence is itself an offence (Article 63). If anyone is injured or in danger, call 112 first.
+
+  - question: How do I report illegal mining or smuggling of minerals?
+    category: complaints
+    owner: Inspection and Enforcement
+    answer: |
+      You can report it to RMB in three ways:
+      1. In this chat: say "I want to report illegal mining" and fill in the form (place, what you saw, when). You may report anonymously. You receive a reference number (RMB-YYYY-XXXXXX) to check progress.
+      2. By phone: RMB toll-free line 2930, or +250 788 386 220.
+      3. By email: info@rmb.gov.rw.
+      Do not confront the people involved. Under Law n° 072/2024, mining without a licence (Article 63), possessing illegally extracted minerals (Article 64) and trading in them (Article 65) are offences.
+
+  - question: How much does it cost to apply for a mining or quarry licence?
+    category: licensing
+    owner: Licensing
+    gap: 3
+    answer: |
+      The service fees for mining and quarry licences are set by regulations of RMB (Article 47 of Law n° 072/2024). [RMB: add the current fee for each licence type and the regulation reference, or a link to the official fee schedule.]
+      Applications and RMB's responses go through the One Stop Center (Article 9). For the current amounts, contact RMB: toll-free 2930, info@rmb.gov.rw.
+
+  - question: How do I apply for a mining licence?
+    category: licensing
+    owner: Licensing
+    answer: |
+      You address your application to RMB (the competent organ), and the application and RMB's response are transmitted through the One Stop Center (Article 9 of Law n° 072/2024). The detailed requirements and steps are set by RMB regulations. [RMB: list the documents required, where to submit (online portal or office), and how long RMB takes to respond.]
+      First decide which licence you need (Article 7): exploration, small-scale, medium-scale or large-scale mining, mineral trading, or mineral processing.
+
+  - question: What happens if a licence holder does not start mining or exploration on time?
+    category: licensing
+    owner: Licensing
+    answer: |
+      The licence can be cancelled. Under Article 53 of Law n° 072/2024, a licence holder is liable to cancellation of the licence for: failing without cause to start exploration or mining operations by the due date; failing without cause to meet payment obligations; not complying with the terms and conditions of the licence or of a provisional suspension decision; or transferring the licence without following the law.
+
+  - question: Can RMB suspend or cancel (revoke) a mining licence?
+    category: licensing
+    owner: Licensing
+    answer: |
+      Yes. RMB can temporarily suspend or cancel a licence (Law n° 072/2024):
+      - Suspension: RMB notifies the holder in writing of a period to fix the problem; once fixed, RMB authorises the holder in writing to resume operations (Article 37(1)).
+      - Cancellation: possible for the faults in Article 53 (not starting operations on time, not paying, not respecting licence conditions, transferring the licence illegally). After cancellation, the holder has 90 days to rehabilitate the site where necessary, clear liabilities and finish any other activity RMB indicates (Article 37(2)).
+      An inspector may also suspend operations immediately when they endanger people's health and safety (Article 42).
+
+  - question: What must a mining company do when it stops mining or gives up its licence area?
+    category: environment
+    owner: Mining Operations and Environment
+    answer: |
+      Under Law n° 072/2024:
+      - Give RMB at least 90 days' notice, provide a map with the coordinates of the area and detailed activity reports (Article 26(1)).
+      - Submit a tax clearance certificate, a document from the district labour inspectorate showing no liabilities to employees, and a rehabilitation certificate (Article 26(2)).
+      - Rehabilitate the site: fill boreholes and excavations, plant trees, remove buildings and level the land, based on the environmental impact assessment (Article 39).
+      - Every licence holder must have a rehabilitation plan with a budget (Article 40) and provide a rehabilitation guarantee (Article 41). The holder stays responsible for the environment until a final rehabilitation certificate is issued (Article 40(2)).
+
+  - question: Minerals were found on my land. What are my rights as the landowner?
+    category: licensing
+    owner: Licensing
+    answer: |
+      Under Article 4 of Law n° 072/2024:
+      - You keep full rights over your land in line with the land laws.
+      - Before a licence holder starts mining, they must give you fair compensation. Once compensated, the land is registered to the State.
+      - For exploration or quarry operations, the licence holder must sign a written lease with you, and the land is handed back to you when the work is completed.
+      You may not mine the minerals yourself without a licence (Article 63), and allowing unlicensed people to mine on your land is an offence (Article 66).
+
+  - question: What are the mining royalty tax rates in Rwanda?
+    category: taxation
+    owner: Mining Fiscal and Revenue
+    gap: 1
+    answer: |
+      Under Article 4 of Law n° 056/2024 on the tax on minerals, the mining royalty tax is:
+      - Base metals (e.g. tin, tantalum, tungsten): 3% of the norm value
+      - Gold: 0.5% of the norm value
+      - Gemstones: 2% of the gross value
+      - Platinum group metals: 2% of the norm value
+      - Rare earth elements: 2% of the norm value
+      - Energy minerals: 3% of the norm value
+      Which category a mineral belongs to is defined in Article 2 of the same law: base metals include tin, tungsten and tantalum (the "3T"), copper, lead, zinc and iron; energy minerals include lithium and graphite; rare earth elements include zirconium and monazite.
+      Minerals exported in raw form also pay an export tax (Article 5).
+
+  - question: Is there a tax on exporting raw (unprocessed) minerals?
+    category: taxation
+    owner: Mining Fiscal and Revenue
+    answer: |
+      Yes. In addition to the royalty, minerals exported in raw form pay an export tax (Article 5 of Law n° 056/2024): base metals 2% of the norm value; gemstones 3%; platinum group metals 2%; rare earth elements 1%; energy minerals 2%; gold 0.5%.
+      The export tax is declared and paid before the minerals are exported (Article 10(1)).
+
+  - question: When must mining royalties be declared and paid?
+    category: taxation
+    owner: Mining Fiscal and Revenue
+    answer: |
+      Under Article 10 of Law n° 056/2024: a taxpayer declares and pays any mining royalty tax withheld within 15 days following the month in which it was withheld, and declares and pays the export tax before the minerals are exported.
+
+  - question: How long is a mining, exploration or quarry licence valid?
+    category: licensing
+    owner: Licensing
+    answer: |
+      Under Law n° 072/2024:
+      - Exploration licence: an initial period of up to 4 years (Article 13).
+      - Mining licence: an initial period of up to 15 years, set from the approved feasibility study and project programme (Article 13).
+      - Non-commercial small-scale quarry licence: 1 year, renewable; commercial small-scale quarry licence: 5 years, renewable; industrial quarry licence: up to 15 years, renewable (Article 30).
+      Licences can be renewed on application (Articles 14, 15 and 31).
+
+  - question: What are the penalties for buying, keeping or selling illegally mined minerals?
+    category: mineral_trading
+    owner: Inspection and Enforcement
+    answer: |
+      Under Law n° 072/2024:
+      - Possessing illegally extracted minerals: 1 to 3 years of imprisonment and/or a fine of FRW 30,000,000 to 60,000,000; for a company or cooperative, FRW 70,000,000 to 90,000,000 (Article 64).
+      - Trading in illegally extracted minerals: more than 5 and up to 10 years of imprisonment and/or a fine of FRW 60,000,000 to 120,000,000; for a company or cooperative, FRW 130,000,000 to 150,000,000 (Article 65).
+      In both cases the court orders the minerals confiscated and handed to RMB for sale by auction. Trading minerals legally requires a mineral trading licence (Article 20).
+
+  - question: What safety rules must mining companies follow, and what can an inspector do?
+    category: health_safety
+    owner: Mining Operations and Environment
+    answer: |
+      Under Article 42 of Law n° 072/2024, the licence holder must make sure the mine is opened, run and closed without endangering the health and safety of workers and other people, and that everyone working there has the skills, competence and resources to work safely.
+      If an authorised officer finds that operations endanger anyone, they can take an urgent decision: the danger must be fixed immediately, or operations are suspended until it is removed. The licence holder can appeal to the head of the organ that issued the licence.
+      If someone is injured or trapped, call 112 immediately.
+
+  - question: Do mining companies have to hire Rwandan contractors and help local communities?
+    category: investment
+    owner: Mining Operations and Environment
+    answer: |
+      Under Law n° 072/2024:
+      - Licence holders must give preference to Rwandan contractors and to goods made in Rwanda when their price, quality and timing are competitive, and report regularly to RMB on this (Article 72).
+      - They must prepare a development and social welfare plan with the authorities of the district where they operate and submit it to RMB (Article 74).
+
+  - question: How can I contact RMB?
+    category: general
+    owner: RMB Communications
+    gap: 22
+    answer: |
+      Rwanda Mines, Petroleum and Gas Board (RMB)
+      - Address: KN 3 Avenue, Nyarugenge, Kigali; P.O. Box 937, Kigali
+      - Toll-free: 2930 · Phone: +250 788 386 220
+      - Email: info@rmb.gov.rw · Website: www.rmb.gov.rw
+      [RMB: add office opening hours, including whether the office opens on Saturday.]
+
+needs_rmb:
+  # Expected questions (from testing and from the knowledge gaps) that none of the documents answer.
+  # RMB should write an official answer for each, or provide the document that contains it.
+  - The fee for each licence type (application, renewal, transfer).
+  - The step-by-step application procedure and required documents (and whether it is online).
+  - RMB office opening hours (weekdays and Saturday).
+  - How to obtain the ICGLR certificate for a mineral export, and how long it takes.
+  - How an artisanal mining cooperative registers (with RCA) and then obtains a licence.
+  - Whether VAT applies to mineral exports (Rwanda Revenue Authority matter).
+  - Whether foreign investors or companies can hold each type of licence, and any conditions.
+  - How long RMB takes to respond to a new licence application.
