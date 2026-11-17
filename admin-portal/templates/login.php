@@ -6,8 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Sign in · RMB AI Assistant admin</title>
-<link rel="stylesheet" href="/assets/app.css?v=8">
-<script src="/assets/i18n.js?v=8"></script>
+<link rel="stylesheet" href="/assets/app.css?v=9">
+<script src="/assets/i18n.js?v=9"></script>
 </head>
 <body class="login-page">
   <main class="login-card">
@@ -37,6 +37,6 @@
     <?php endif; ?>
     <p class="muted small">Access is restricted to authorised RMB personnel. Activity is logged.</p>
   </main>
-  <script src="/assets/fallback.js?v=8"></script>
+  <script src="/assets/fallback.js?v=9"></script>
 </body>
 </html>

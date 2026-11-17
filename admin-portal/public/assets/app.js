@@ -421,10 +421,10 @@
     const P = SUBPAGES.find((p) => p.id === id) || SUBPAGES[0], C = PAGE_COPY[P.id], page = +(params.page || 0), size = 8;
     const sums = await Promise.all(P.cats.map((c) => api(`analytics/summary?days=${Math.max(S.days, 365)}&category=${c}`)));
     const period = await Promise.all(P.cats.map((c) => api(`analytics/summary?days=${S.days}&category=${c}`)));
-    const T = period.reduce((a, s) => { for (const [k, v] of Object.entries(s.totals)) if (typeof v === "number") a[k] = (a[k] || 0) + v; return a; }, {});
+    const TOT = period.reduce((a, s) => { for (const [k, v] of Object.entries(s.totals)) if (typeof v === "number") a[k] = (a[k] || 0) + v; return a; }, {});
     const lat = period.map((s) => s.totals.median_latency_ms).filter((v) => v != null);
     const latency = lat.length ? lat.reduce((a, b) => a + b, 0) / lat.length : null;
-    const answerRate = T.information_requests ? T.answered / T.information_requests : null;
+    const answerRate = TOT.information_requests ? TOT.answered / TOT.information_requests : null;
     const dailyAll = {};
     sums.forEach((s) => s.daily.forEach((d) => { const x = dailyAll[d.day] || (dailyAll[d.day] = {day: d.day, conversations: 0, questions: 0}); x.conversations += d.conversations; x.questions += d.questions; }));
     const daily = Object.values(dailyAll).sort((a, b) => a.day.localeCompare(b.day));
@@ -439,12 +439,12 @@
     // ---- cards
     let cards;
     if (P.id === "licensing") {
-      cards = stat("Total sector requests", cnum(T.conversations || 0), `<span>requested about mining.</span><span>${secs(latency)}</span>`) +
+      cards = stat("Total sector requests", cnum(TOT.conversations || 0), `<span>requested about mining.</span><span>${secs(latency)}</span>`) +
         stat("AI first-contact resolution", cpct(answerRate), `<span>Avg Response Latency</span><span>${secs(latency)}</span>`) +
-        stat("High-risk inquiries", cnum((T.not_covered || 0) + (T.handovers || 0) + (T.emergencies || 0)), "<span>Flagged</span>");
+        stat("High-risk inquiries", cnum((TOT.not_covered || 0) + (TOT.handovers || 0) + (TOT.emergencies || 0)), "<span>Flagged</span>");
     } else if (P.id === "investment") {
       const meetings = can("cases_read") ? (await api("cases?relevance=all&limit=200")).filter((c) => c.type === "meeting_request" || c.type === "geodata_request").length : null;
-      cards = stat("Prospective deals", cnum(T.conversations || 0), "<span>Inquiries Logged</span>") +
+      cards = stat("Prospective deals", cnum(TOT.conversations || 0), "<span>Inquiries Logged</span>") +
         stat("Answered from official documents", cpct(answerRate), "<span>RMB &amp; RDB investment prospectuses</span>") +
         stat("Meeting &amp; data requests", meetings == null ? "–" : cnum(meetings), "<span>Investor follow-ups</span>");
     } else if (P.id === "complaints") {
@@ -455,8 +455,8 @@
         stat("Urgent escalations", cnum(urgent), "<span>Automated triage &amp; officer notified</span>") +
         stat("Turnaround response", hrs == null ? "–" : cnum(Math.round(hrs), "h"), "<span>Average time to resolution</span>");
     } else {
-      cards = stat("Total logged records", cnum(T.conversations || 0), "<span>conversations</span>") +
-        stat("Autonomous resolution", cpct(answerRate), `<span><b>${num(T.answered || 0)}</b> Resolved</span>`) +
+      cards = stat("Total logged records", cnum(TOT.conversations || 0), "<span>conversations</span>") +
+        stat("Autonomous resolution", cpct(answerRate), `<span><b>${num(TOT.answered || 0)}</b> Resolved</span>`) +
         stat("Triage &amp; latency", csec(latency), "<span>Median response</span>");
     }
 
